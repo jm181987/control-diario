@@ -12,7 +12,46 @@ export async function POST(request:Request){
  const user=result.rows[0];
  if(!user||user.disabled)return NextResponse.json({error:'Credenciales incorrectas'},{status:401});
  let valid=false;
- if(/^\\$2[aby]\\$/.test(user.password_hash)){
+ if(user.password_hash.startsWith('$2a{
+  const check=await db().query('SELECT crypt($1,$2) = $2 AS valid',[password,user.password_hash]);
+  valid=check.rows[0]?.valid===true;
+ }else{
+  valid=passwordMatches(password,user.password_hash);
+ }
+ if(!valid)return NextResponse.json({error:'Credenciales incorrectas'},{status:401});
+ const token=makeToken({id:user.id,role:user.role,exp:Date.now()+8*60*60*1000});
+ const res=NextResponse.json({ok:true,role:user.role});
+ res.cookies.set('cd_session',token,{httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'strict',path:'/',maxAge:8*60*60});
+ return res;
+ }catch{return NextResponse.json({error:'No se pudo iniciar sesión'},{status:500})}
+}
+)||user.password_hash.startsWith('$2b{
+  const check=await db().query('SELECT crypt($1,$2) = $2 AS valid',[password,user.password_hash]);
+  valid=check.rows[0]?.valid===true;
+ }else{
+  valid=passwordMatches(password,user.password_hash);
+ }
+ if(!valid)return NextResponse.json({error:'Credenciales incorrectas'},{status:401});
+ const token=makeToken({id:user.id,role:user.role,exp:Date.now()+8*60*60*1000});
+ const res=NextResponse.json({ok:true,role:user.role});
+ res.cookies.set('cd_session',token,{httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'strict',path:'/',maxAge:8*60*60});
+ return res;
+ }catch{return NextResponse.json({error:'No se pudo iniciar sesión'},{status:500})}
+}
+)||user.password_hash.startsWith('$2y{
+  const check=await db().query('SELECT crypt($1,$2) = $2 AS valid',[password,user.password_hash]);
+  valid=check.rows[0]?.valid===true;
+ }else{
+  valid=passwordMatches(password,user.password_hash);
+ }
+ if(!valid)return NextResponse.json({error:'Credenciales incorrectas'},{status:401});
+ const token=makeToken({id:user.id,role:user.role,exp:Date.now()+8*60*60*1000});
+ const res=NextResponse.json({ok:true,role:user.role});
+ res.cookies.set('cd_session',token,{httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'strict',path:'/',maxAge:8*60*60});
+ return res;
+ }catch{return NextResponse.json({error:'No se pudo iniciar sesión'},{status:500})}
+}
+)){
   const check=await db().query('SELECT crypt($1,$2) = $2 AS valid',[password,user.password_hash]);
   valid=check.rows[0]?.valid===true;
  }else{
