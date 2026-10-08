@@ -25,7 +25,9 @@ export async function POST(request:Request) {
   const res=NextResponse.json({ok:true,role:user.role});
   res.cookies.set('cd_session',token,{httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'strict',path:'/',maxAge:8*60*60});
   return res;
- }catch{
-  return NextResponse.json({error:'No se pudo iniciar sesión'},{status:500});
+ }catch(error){
+  console.error('[auth/login]',error instanceof Error?error.message:'Unknown login error');
+  const configError=error instanceof Error && error.message.includes('SESSION_SECRET');
+  return NextResponse.json({error:configError?'Configuración de sesión inválida: SESSION_SECRET debe tener al menos 32 caracteres':'Error interno al iniciar sesión. Revisá los logs de la función /api/auth/login en Vercel.'},{status:500});
  }
 }
