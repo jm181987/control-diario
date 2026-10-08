@@ -6,7 +6,7 @@ export async function GET(request:Request){
  const user=await currentUser();if(!user)return NextResponse.json({error:'No autorizado'},{status:401});
  const params=new URL(request.url).searchParams;
  const month=params.get('month');
- if(!month||!/^\\d{4}-(0[1-9]|1[0-2])$/.test(month))return NextResponse.json({error:'Mes inválido (AAAA-MM)'},{status:400});
+ if(!month||!/^\d{4}-(0[1-9]|1[0-2])$/.test(month))return NextResponse.json({error:'Mes inválido (AAAA-MM)'},{status:400});
  const company=params.get('company');
  if(company && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(company))return NextResponse.json({error:'Empresa inválida'},{status:400});
  try{
